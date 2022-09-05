@@ -9,6 +9,7 @@ import (
 type Repository interface {
 	Save(user Users) (Users, error)
 	FindByEmail(name string, password string) (Users, error)
+	FindById(id int) (Users, error)
 }
 
 type repository struct {
@@ -33,6 +34,17 @@ func (r *repository) FindByEmail(email string, password string) (Users, error) {
 	var user Users
 
 	err := r.db.Where("email = ? AND password_hash = ?", email, password).Find(&user).Error
+
+	if err != nil {
+		return user, err
+	}
+	return user, nil
+}
+
+func (r *repository) FindById(id int) (Users, error) {
+	var user Users
+
+	err := r.db.Where("id = ?", id).Find(&user).Error
 
 	if err != nil {
 		return user, err

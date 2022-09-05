@@ -17,10 +17,32 @@ type usersHandler struct {
 func NewUserHandler(userService user.Service) *usersHandler {
 	return &usersHandler{userService}
 }
+
+func (h *usersHandler) UserById(c *gin.Context) {
+
+	var input user.UserInput
+
+	err := c.ShouldBindUri(&input)
+
+	if err != nil {
+		response := helpers.APIResponse("Fetch Failed", http.StatusUnprocessableEntity, "error", err)
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	user, err := h.userService.GetUserById(input)
+
+	if err != nil {
+		response := helpers.APIResponse("Fetch Failed", http.StatusUnprocessableEntity, "error", nil)
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	response := helpers.APIResponse("User Detail", http.StatusOK, "success", user)
+	c.JSON(http.StatusOK, response)
+
+}
 func (h *usersHandler) RegisterUser(c *gin.Context) {
-	// tangkap user dari user
-	// map input dari user ke struck RegisterUserInput
-	// struc diatas di posting sebagai parameter service
 	var input user.RegisterUserInput
 
 	err := c.ShouldBindJSON(&input)

@@ -9,6 +9,7 @@ import (
 type Service interface {
 	RegisterUserInput(input RegisterUserInput) (Users, error)
 	Login(input LoginInput) (Users, error)
+	GetUserById(input UserInput) (Users, error)
 }
 
 type service struct {
@@ -19,6 +20,21 @@ func NewService(repository Repository) *service {
 	return &service{repository}
 }
 
+func (s *service) GetUserById(input UserInput) (Users, error) {
+	user, err := s.repository.FindById(input.ID)
+	if err != nil {
+		return user, err
+	}
+
+	if user.ID == 0 {
+		return user, errors.New("NO USER FIND IN EMAIL")
+	}
+
+	if err != nil {
+		return user, nil
+	}
+	return user, nil
+}
 func (s *service) RegisterUserInput(input RegisterUserInput) (Users, error) {
 	user := Users{}
 	user.Name = input.Name
@@ -41,6 +57,7 @@ func (s *service) RegisterUserInput(input RegisterUserInput) (Users, error) {
 }
 
 func (s *service) Login(input LoginInput) (Users, error) {
+
 	email := input.Email
 	password := input.Password
 
@@ -52,7 +69,6 @@ func (s *service) Login(input LoginInput) (Users, error) {
 	if user.ID == 0 {
 		return user, errors.New("NO USER FIND IN EMAIL")
 	}
-
 
 	if err != nil {
 		return user, nil
